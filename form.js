@@ -177,6 +177,16 @@ function score(opts) {
   lines.push("All items: " + r.total + " / " + r.max + " (not a form category)");
   lines.push("", "Scoring: Not at all = 0, Just a little = 1, Pretty much = 2, Very much = 3. 35-49% mild to moderate, 50-69% moderate to severe, above 70% major interference.", "", "Item, rating, label");
   ITEMS.forEach((it, i) => { lines.push(""); lines.push(it.code + " " + it.text); lines.push("Answer: " + r.ratings[i] + "  " + SCALE[r.ratings[i]]); });
+  const top = r.subs.slice().sort((a, b) => b.pct - a.pct).slice(0, 3).map(s => s.title.replace(/^[IVX]+\. /, "") + " " + s.pct + "%").join("; ");
+  const banded = r.subs.filter(s => s.pct >= 35).map(s => s.title.replace(/^[IVX]+\. /, "") + " " + s.score + "/" + s.max + " (" + s.pct + "%, " + s.band.split(": ")[1] + ")");
+  const totPct = Math.round(r.total / r.max * 100);
+  const blurb = "Copeland Symptom Checklist for Adult ADD (63 items, " + (by === "Self" ? "self-report" : "completed by another rater") + ") completed on " + (date || "undated") + ". "
+    + "All items total " + r.total + "/" + r.max + " (" + totPct + "% of max); the form scores by category, not by total. "
+    + "Category scores: " + r.subs.map(s => s.title.replace(/^[IVX]+\. /, "") + " " + s.score + "/" + s.max + " (" + s.pct + "%)").join(", ") + ". "
+    + (banded.length ? "Categories in a form-listed range (35-49% mild to moderate, 50-69% moderate to severe, above 70% major interference): " + banded.join("; ") + ". " : "No category reached 35%, the lowest range listed on the form. ")
+    + "Highest categories: " + top + ". Screening only, not diagnostic; correlate clinically.";
+  lines.splice(lines.indexOf("Category scores (score / possible, percent, band per form):"), 0, "EHR blurb (copy and paste):", blurb, "");
+  window._blurb = blurb;
   window._ocsSummary = lines.join("\n");
   window._meta = { name, date, visit, by, r };
   document.getElementById("summaryBox").value = window._ocsSummary;
@@ -234,6 +244,7 @@ function sendOffice() {
   };
   m.r.subs.forEach(s => { body["cat_" + s.key] = s.score + " / " + s.max + " = " + s.pct + "% (" + s.band + ")"; });
   body.all_items = m.r.total + " / " + m.r.max;
+  body.ehr_blurb = window._blurb;
   body.message = window._ocsSummary;
   fetch("https://formsubmit.co/ajax/" + OFFICE, {
     method: "POST",
