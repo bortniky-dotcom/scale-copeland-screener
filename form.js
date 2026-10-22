@@ -2,8 +2,8 @@ const OFFICE = "office@readywellpsych.com";
 const SCALE = { 0: "Not at all", 1: "Just a little", 2: "Pretty much", 3: "Very much" };
 const SECTIONS = [
   { key: "I", title: "I. INATTENTION / DISTRACTIBILITY", items: [
-    "A short attention span, especially for lo-interest activities.",
-    "Difficulty competing tasks.",
+    "A short attention span, especially for low interest activities.",
+    "Difficulty completing tasks.",
     "Daydreaming.",
     "Easily distracted.",
     "Nicknames such as: \"spacey\" or \"dreamer\".",
@@ -31,7 +31,7 @@ const SECTIONS = [
     ]},
     { sub: "B", title: "B. Underactivity", items: [
       "Lethargic",
-      "Daydreaming, spiciness.",
+      "Daydreaming, spaciness.",
       "Failure to complete tasks.",
       "Inattention.",
       "Lacking in leadership.",
